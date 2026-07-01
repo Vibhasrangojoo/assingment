@@ -222,7 +222,7 @@ export default function StudentRecordApp() {
         <table className="records-table">
           <thead>
             <tr className="table-header">
-              <th className="table-cell">Roll No</th>
+              <th className="table-cell">Roll</th>
               <th className="table-cell">Name</th>
               <th className="table-cell">Marks</th>
               <th className="table-cell">Actions</th>
