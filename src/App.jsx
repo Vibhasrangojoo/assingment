@@ -38,11 +38,13 @@ export default function StudentRecordApp() {
     localStorage.setItem('studentRecords', JSON.stringify(students));
   }, [students]);
 
+  // Robust, trimmed, and case-insensitive search mechanism
   const filteredStudents = useMemo(() => {
+    const cleanQuery = searchQuery.toLowerCase().trim();
     return students.filter(
       (s) =>
-        s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        s.rollNumber.includes(searchQuery)
+        s.name.toLowerCase().includes(cleanQuery) ||
+        s.rollNumber.toLowerCase().includes(cleanQuery)
     );
   }, [students, searchQuery]);
 
@@ -84,7 +86,11 @@ export default function StudentRecordApp() {
       setIsEditing(false);
       setEditId(null);
     } else {
-      if (students.some((s) => s.rollNumber === studentData.rollNumber)) {
+      // Case-insensitive roll number validation
+      const rollExists = students.some(
+        (s) => s.rollNumber.toLowerCase() === studentData.rollNumber.toLowerCase()
+      );
+      if (rollExists) {
         setError('Roll Number already exists!');
         return;
       }
@@ -153,7 +159,7 @@ export default function StudentRecordApp() {
                 <div className="graph-track">
                   <div 
                     className="graph-fill" 
-                    style={{ width: `${Math.min(Math.max(student.marks, 0), 100)}%` }}
+                    style={{ width: `${Math.min(Math.max(Number(student.marks), 0), 100)}%` }}
                   >
                     <span className="graph-value">{student.marks}%</span>
                   </div>
@@ -169,7 +175,7 @@ export default function StudentRecordApp() {
           type="text"
           placeholder="Roll Number"
           value={rollNumber}
-          onChange={(e) => setRollNumber(e.target.value)}
+          onChange={(e) => setRollNumber(e.target.value.replace(/[^0-9]/g, ''))}
           className="form-input"
           disabled={isEditing}
         />
@@ -177,7 +183,7 @@ export default function StudentRecordApp() {
           type="text"
           placeholder="Student Name"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => setName(e.target.value.replace(/[^a-zA-Z\s]/g, ''))}
           className="form-input"
         />
         <input
@@ -222,7 +228,7 @@ export default function StudentRecordApp() {
         <table className="records-table">
           <thead>
             <tr className="table-header">
-              <th className="table-cell">Roll</th>
+              <th className="table-cell">Roll No</th>
               <th className="table-cell">Name</th>
               <th className="table-cell">Marks</th>
               <th className="table-cell">Actions</th>
